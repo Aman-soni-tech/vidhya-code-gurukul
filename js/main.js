@@ -1,20 +1,39 @@
 // ================= FIREBASE INITIALIZATION =================
 let database = null;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyBKuS1tU6TKRjJpWOAWroNNiGXeXtMyI2E",
-  authDomain: "vidhya-code.firebaseapp.com",
-  databaseURL: "https://vidhya-code-default-rtdb.firebaseio.com",
-  projectId: "vidhya-code",
-  storageBucket: "vidhya-code.appspot.com",
-  messagingSenderId: "593593593593",
-  appId: "1:593593593593:web:abc123def456"
-};
+// Wait for Firebase to load, then initialize
+function initializeFirebase() {
+  if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length === 0) {
+    const firebaseConfig = {
+      apiKey: "AIzaSyBKuS1tU6TKRjJpWOAWroNNiGXeXtMyI2E",
+      authDomain: "vidhya-code.firebaseapp.com",
+      databaseURL: "https://vidhya-code-default-rtdb.firebaseio.com",
+      projectId: "vidhya-code",
+      storageBucket: "vidhya-code.appspot.com",
+      messagingSenderId: "593593593593",
+      appId: "1:593593593593:web:abc123def456"
+    };
+    
+    try {
+      firebase.initializeApp(firebaseConfig);
+      database = firebase.database();
+      console.log("✅ Firebase initialized successfully");
+    } catch(error) {
+      console.error("⚠️ Firebase initialization error:", error);
+    }
+  }
+}
 
-// Initialize Firebase only when firebase is available
-if (typeof firebase !== 'undefined') {
-  firebase.initializeApp(firebaseConfig);
-  database = firebase.database();
+// Initialize Firebase when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+  initializeFirebase();
+});
+
+// Also try immediate initialization
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeFirebase);
+} else {
+  initializeFirebase();
 }
 
 // ================= LOGIN FUNCTION =================
