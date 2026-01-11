@@ -374,42 +374,33 @@ function addStudentResult(){
     addedDate: new Date().toLocaleDateString()
   };
 
-  // Save to both Firebase AND localStorage (hybrid approach)
-  if(database){
-    // Firebase for syncing across devices
-    const resultsRef = database.ref('studentResults');
-    resultsRef.push(newResult).then(() => {
-      // Also save to localStorage as backup
-      let results = JSON.parse(localStorage.getItem("studentResults")) || [];
-      results.push(newResult);
-      localStorage.setItem("studentResults", JSON.stringify(results));
-      
-      alert("✅ Result added successfully!");
-      
-      // Clear form
-      document.getElementById("resultForm").reset();
-      
-      // Refresh display
-      displayResults();
-      updateStatistics();
-    }).catch(error => {
-      alert("❌ Error adding result: " + error.message);
-    });
-  } else {
-    // Fallback to localStorage only if Firebase not available
-    let results = JSON.parse(localStorage.getItem("studentResults")) || [];
-    results.push(newResult);
-    localStorage.setItem("studentResults", JSON.stringify(results));
-    
-    alert("✅ Result added successfully!");
-    
-    // Clear form
-    document.getElementById("resultForm").reset();
-    
-    // Refresh display
-    displayResults();
-    updateStatistics();
+  // Always save to localStorage first (guaranteed to work)
+  let results = JSON.parse(localStorage.getItem("studentResults")) || [];
+  results.push(newResult);
+  localStorage.setItem("studentResults", JSON.stringify(results));
+
+  // Try to also save to Firebase if available
+  if(database && typeof database.ref === 'function'){
+    try {
+      const resultsRef = database.ref('studentResults');
+      resultsRef.push(newResult).then(() => {
+        console.log("✅ Saved to Firebase successfully");
+      }).catch(error => {
+        console.error("⚠️ Firebase error (data still saved locally):", error);
+      });
+    } catch(error) {
+      console.error("⚠️ Firebase error (data still saved locally):", error);
+    }
   }
+  
+  alert("✅ Result added successfully!");
+  
+  // Clear form
+  document.getElementById("resultForm").reset();
+  
+  // Refresh display
+  displayResults();
+  updateStatistics();
 }
 
 // Display results
