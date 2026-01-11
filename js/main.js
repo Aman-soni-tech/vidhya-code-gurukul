@@ -1,3 +1,18 @@
+// ================= FIREBASE INITIALIZATION =================
+const firebaseConfig = {
+  apiKey: "AIzaSyBKuS1tU6TKRjJpWOAWroNNiGXeXtMyI2E",
+  authDomain: "vidhya-code.firebaseapp.com",
+  databaseURL: "https://vidhya-code-default-rtdb.firebaseio.com",
+  projectId: "vidhya-code",
+  storageBucket: "vidhya-code.appspot.com",
+  messagingSenderId: "593593593593",
+  appId: "1:593593593593:web:abc123def456"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 // ================= LOGIN FUNCTION =================
 function login(event){
   event.preventDefault();
@@ -340,8 +355,6 @@ function addStudentResult(){
     return;
   }
 
-  let results = JSON.parse(localStorage.getItem("studentResults")) || [];
-
   let newResult = {
     id: Date.now(),
     name: name,
@@ -357,108 +370,128 @@ function addStudentResult(){
     addedDate: new Date().toLocaleDateString()
   };
 
-  results.push(newResult);
-  localStorage.setItem("studentResults", JSON.stringify(results));
-
-  alert("✅ Result added successfully!");
-
-  // Clear form
-  document.getElementById("studentName").value = "";
-  document.getElementById("rollNumber").value = "";
-  document.getElementById("studentEmail").value = "";
-  document.getElementById("courseSelect").value = "";
-  document.getElementById("batchSelect").value = "";
-  document.getElementById("marksObtained").value = "";
-  document.getElementById("totalMarks").value = "100";
-  document.getElementById("resultDate").value = "";
-  document.getElementById("remarks").value = "";
-
-  displayResults();
-  updateStatistics();
+  // Save to both Firebase AND localStorage (hybrid approach)
+  // Firebase for syncing across devices
+  const resultsRef = database.ref('studentResults');
+  resultsRef.push(newResult).then(() => {
+    // Also save to localStorage as backup
+    let results = JSON.parse(localStorage.getItem("studentResults")) || [];
+    results.push(newResult);
+    localStorage.setItem("studentResults", JSON.stringify(results));
+    
+    alert("✅ Result added successfully!");
+    
+    // Clear form
+    document.getElementById("resultForm").reset();
+    
+    // Refresh display
+    displayResults();
+    updateStatistics();
+  }).catch(error => {
+    alert("❌ Error adding result: " + error.message);
+  });
 }
 
 // Display results
 function displayResults(){
   const resultsContainer = document.getElementById("resultsContainer");
-  let results = JSON.parse(localStorage.getItem("studentResults")) || [];
-
-  // Apply filters
-  let filteredResults = results;
   
-  let searchTerm = document.getElementById("searchStudent").value.toLowerCase();
-  let courseFilter = document.getElementById("filterCourse").value;
-  let batchFilter = document.getElementById("filterBatch").value;
-
-  if(searchTerm){
-    filteredResults = filteredResults.filter(r => 
-      r.name.toLowerCase().includes(searchTerm) || 
-      r.rollNumber.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  if(courseFilter){
-    filteredResults = filteredResults.filter(r => r.course === courseFilter);
-  }
-
-  if(batchFilter){
-    filteredResults = filteredResults.filter(r => r.batch === batchFilter);
-  }
-
-  if(filteredResults.length === 0){
-    resultsContainer.innerHTML = '<div class="empty-state"><p>📝 No results found. Try different filters or add a new result!</p></div>';
-    return;
-  }
-
-  let html = "";
-  filteredResults.reverse().forEach(result => {
-    let statusClass = result.percentage >= 70 ? "pass" : "fail";
-    let statusText = result.percentage >= 70 ? "PASS ✓" : "FAIL ✗";
+  // Try to load from Firebase first, fallback to localStorage
+  const resultsRef = database.ref('studentResults');
+  resultsRef.once('value', snapshot => {
+    let results = [];
     
-    html += `
-      <div class="result-card">
-        <div class="result-header">
-          <div class="result-name">${result.name}</div>
-          <div class="result-roll">${result.rollNumber}</div>
-        </div>
-        
-        <div class="result-meta">
-          <div class="result-meta-item">
-            <strong>Course</strong>
-            ${result.course}
-          </div>
-          <div class="result-meta-item">
-            <strong>Batch</strong>
-            ${result.batch}
-          </div>
-          <div class="result-meta-item">
-            <strong>Email</strong>
-            <span style="font-size:11px;">${result.email}</span>
-          </div>
-          <div class="result-meta-item">
-            <strong>Exam Date</strong>
-            ${result.date}
-          </div>
-        </div>
+    if(snapshot.exists()){
+      // Load from Firebase
+      snapshot.forEach(childSnapshot => {
+        results.push(childSnapshot.val());
+      });
+    } else {
+      // Fallback to localStorage
+      results = JSON.parse(localStorage.getItem("studentResults")) || [];
+    }
 
-        <div class="result-score">
-          <div class="score-display">
-            <p>Score</p>
-            <div class="score-percentage">${result.percentage}%</div>
-            <p style="font-size:12px; color:#64748b; margin-top:4px;">${result.marksObtained}/${result.totalMarks} marks</p>
-          </div>
-          <div class="score-status ${statusClass}">${statusText}</div>
-        </div>
+    // Apply filters
+    let filteredResults = results;
+    
+    let searchTerm = document.getElementById("searchStudent").value.toLowerCase();
+    let courseFilter = document.getElementById("filterCourse").value;
+    let batchFilter = document.getElementById("filterBatch").value;
 
-        ${result.remarks ? `<div class="result-remarks">📝 ${result.remarks}</div>` : ''}
-        
-        <div class="result-date">Added on: ${result.addedDate}</div>
-        
-        <button class="result-delete-btn" onclick="deleteResult(${result.id})">Delete Result</button>
-      </div>
-    `;
+    if(searchTerm){
+      filteredResults = filteredResults.filter(r => 
+        r.name.toLowerCase().includes(searchTerm) || 
+        r.rollNumber.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    if(courseFilter){
+      filteredResults = filteredResults.filter(r => r.course === courseFilter);
+    }
+
+    if(batchFilter){
+      filteredResults = filteredResults.filter(r => r.batch === batchFilter);
+    }
+
+    if(filteredResults.length === 0){
+      resultsContainer.innerHTML = '<div class="empty-state"><p>📝 No results found. Try different filters or add a new result!</p></div>';
+      return;
+    }
+
+    let html = "";
+    filteredResults.reverse().forEach(result => {
+      let statusClass = result.percentage >= 70 ? "pass" : "fail";
+      let statusText = result.percentage >= 70 ? "PASS ✓" : "FAIL ✗";
+      
+      html += `
+        <div class="result-card">
+          <div class="result-header">
+            <div class="result-name">${result.name}</div>
+            <div class="result-roll">${result.rollNumber}</div>
+          </div>
+          
+          <div class="result-meta">
+            <div class="result-meta-item">
+              <strong>Course</strong>
+              ${result.course}
+            </div>
+            <div class="result-meta-item">
+              <strong>Batch</strong>
+              ${result.batch}
+            </div>
+            <div class="result-meta-item">
+              <strong>Email</strong>
+              <span style="font-size:11px;">${result.email}</span>
+            </div>
+            <div class="result-meta-item">
+              <strong>Exam Date</strong>
+              ${result.date}
+            </div>
+          </div>
+
+          <div class="result-score">
+            <div class="score-display">
+              <p>Score</p>
+              <div class="score-percentage">${result.percentage}%</div>
+              <p style="font-size:12px; color:#64748b; margin-top:4px;">${result.marksObtained}/${result.totalMarks} marks</p>
+            </div>
+            <div class="score-status ${statusClass}">${statusText}</div>
+          </div>
+
+          ${result.remarks ? `<div class="result-remarks">📝 ${result.remarks}</div>` : ''}
+          
+          <div class="result-date">Added on: ${result.addedDate}</div>
+          
+          <button class="result-delete-btn" onclick="deleteResult(${result.id})">Delete Result</button>
+        </div>
+      `;
+    });
+
+    resultsContainer.innerHTML = html;
+  }).catch(error => {
+    console.error("Error loading results:", error);
+    resultsContainer.innerHTML = '<div class="empty-state"><p>❌ Error loading results. Please refresh the page.</p></div>';
   });
-
-  resultsContainer.innerHTML = html;
 }
 
 // Filter results
