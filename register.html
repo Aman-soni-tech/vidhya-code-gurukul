@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register | Vidhya Code Gurukul</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/main.js"></script>
+</head>
+<body>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <h2>Create Account</h2>
+    <p>Join Vidhya Code Gurukul and start your coding journey</p>
+    
+    <form onsubmit="registerUser(event)">
+      <input type="text" id="fullname" placeholder="Full Name" required>
+      <input type="email" id="reg-email" placeholder="Email Address" required>
+      <input type="tel" id="phone" placeholder="Phone Number" required>
+      <input type="password" id="reg-password" placeholder="Password" required>
+      <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+      
+      <div class="checkbox-group">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">I agree to the Terms & Conditions</label>
+      </div>
+      
+      <button type="submit">Create Account</button>
+    </form>
+    
+    <div class="link-text">
+      Already have an account? <a href="index.html">Sign In</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

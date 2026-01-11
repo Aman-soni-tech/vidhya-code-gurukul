@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Promotions | Vidhya Code Gurukul</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/main.js"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-left">
+    <img src="logo.png" alt="Vidhya Code Gurukul Logo" class="nav-logo">
+  </div>
+
+  <nav class="nav-right">
+    <a href="dashboard.html">Home</a>
+    <a href="courses.html">Courses</a>
+    <a href="batches.html">Batches</a>
+    <a href="promotions.html">Promotions</a>
+    <a href="results.html">Results</a>
+    <a href="contact.html">Contact</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h1>🎉 Special Promotions</h1>
+  <p>Grab amazing offers and discounts on our courses</p>
+  
+  <!-- Banner Upload Section -->
+  <div class="promo-upload-section">
+    <h2>Upload Promotional Banners</h2>
+    <div class="upload-box">
+      <input type="file" id="bannerInput" accept="image/*" onchange="handleBannerUpload(event)">
+      <label for="bannerInput" class="upload-label">
+        <div class="upload-icon">📁</div>
+        <p>Click to upload or drag & drop</p>
+        <span>PNG, JPG up to 5MB</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Promotional Banners Gallery -->
+  <div class="promo-section">
+    <h2>Featured Banners</h2>
+    <div class="banners-gallery" id="bannersGallery">
+      <!-- Banners will be displayed here -->
+      <div class="empty-state">
+        <p>📸 No banners uploaded yet. Add promotional banners to showcase special offers!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Promotional Content Section -->
+  <div class="promo-section">
+    <h2>📢 Active Promotions</h2>
+    
+    <!-- Promo Add Form -->
+    <div class="promo-form">
+      <div class="form-group">
+        <input type="text" id="promoTitle" placeholder="Promotion Title" maxlength="50">
+      </div>
+      <div class="form-group">
+        <textarea id="promoDesc" placeholder="Promotion Description" maxlength="200" rows="3"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <input type="number" id="promoDiscount" placeholder="Discount %" min="0" max="100">
+        </div>
+        <div class="form-group">
+          <input type="text" id="promoCourse" placeholder="Course Name">
+        </div>
+        <div class="form-group">
+          <input type="date" id="promoExpiry">
+        </div>
+      </div>
+      <button onclick="addPromotion()" class="promo-btn-add">Add Promotion</button>
+    </div>
+
+    <!-- Promos Display -->
+    <div class="promos-list" id="promosList">
+      <!-- Promotions will be displayed here -->
+      <div class="empty-state">
+        <p>🎯 No promotions added yet. Create your first promotion!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sample Promotions (Pre-loaded) -->
+  <div class="promo-section">
+    <h2>🌟 Featured Offers</h2>
+    <div class="featured-promos">
+      <div class="featured-promo-card">
+        <div class="promo-badge">HOT DEAL</div>
+        <h3>30% OFF - Web Development</h3>
+        <p class="promo-offer-text">Learn full-stack development at an unbeatable price!</p>
+        <p class="promo-course-tag">Web Development Course</p>
+        <p class="promo-validity">Valid till: 31st January 2026</p>
+        <button class="promo-btn-enroll">Enroll Now</button>
+      </div>
+
+      <div class="featured-promo-card">
+        <div class="promo-badge">LIMITED TIME</div>
+        <h3>Buy 1 Course, Get 1 Free</h3>
+        <p class="promo-offer-text">Enroll in any course and get another course absolutely free!</p>
+        <p class="promo-course-tag">All Programming Courses</p>
+        <p class="promo-validity">Valid till: 15th January 2026</p>
+        <button class="promo-btn-enroll">Enroll Now</button>
+      </div>
+
+      <div class="featured-promo-card">
+        <div class="promo-badge">SPECIAL</div>
+        <h3>Flat ₹2000 OFF - Weekend Batch</h3>
+        <p class="promo-offer-text">Join our weekend batch and save ₹2000 on your entire course!</p>
+        <p class="promo-course-tag">Weekend Batch</p>
+        <p class="promo-validity">Valid till: 30th January 2026</p>
+        <button class="promo-btn-enroll">Enroll Now</button>
+      </div>
+
+      <div class="featured-promo-card">
+        <div class="promo-badge">NEW OFFER</div>
+        <h3>15% OFF - Referral Program</h3>
+        <p class="promo-offer-text">Refer a friend and get 15% discount on your next course!</p>
+        <p class="promo-course-tag">All Courses</p>
+        <p class="promo-validity">Valid till: 31st March 2026</p>
+        <button class="promo-btn-enroll">Enroll Now</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-header">
+      <div class="footer-logo">VCG</div>
+      <div class="footer-header-text">
+        <h2>Vidhya Code Gurukul</h2>
+        <p>Your Gateway to Professional Coding Excellence</p>
+      </div>
+    </div>
+
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>About Us</h3>
+        <p>Vidhya Code Gurukul is dedicated to providing high-quality programming education to students and professionals. We believe in igniting the coding journey for everyone.</p>
+        <p>Our mission is to make quality education accessible and affordable for all aspiring developers.</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="batches.html">Batches</a></li>
+          <li><a href="promotions.html">Promotions</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="#">Terms & Conditions</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Popular Courses</h3>
+        <ul>
+          <li>C Language</li>
+          <li>C++</li>
+          <li>Java</li>
+          <li>Python</li>
+          <li>Web Development</li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Contact Info</h3>
+        <div class="footer-contact">
+          <div class="footer-contact-icon">📍</div>
+          <div>
+            <strong>Address:</strong><br>
+            Helipad ke Piche, Tekamgarh<br>
+            Madhya Pradesh 472001
+          </div>
+        </div>
+        <div class="footer-contact">
+          <div class="footer-contact-icon">📞</div>
+          <div>
+            <strong>Phone:</strong><br>
+            +91 62329 83739
+          </div>
+        </div>
+        <div class="footer-contact">
+          <div class="footer-contact-icon">✉️</div>
+          <div>
+            <strong>Email:</strong><br>
+            ssaman7566@gmail.com
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 <strong>Vidhya Code Gurukul</strong> | All Rights Reserved | Designed & Managed by <a href="#">Vidhya Code Gurukul</a></p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

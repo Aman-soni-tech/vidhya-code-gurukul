@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Results | Vidhya Code Gurukul</title>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/main.js"></script>
+</head>
+<body>
+
+<header class="navbar">
+  <div class="nav-left">
+    <img src="logo.png" alt="Vidhya Code Gurukul Logo" class="nav-logo">
+  </div>
+
+  <nav class="nav-right">
+    <a href="dashboard.html">Home</a>
+    <a href="courses.html">Courses</a>
+    <a href="batches.html">Batches</a>
+    <a href="promotions.html">Promotions</a>
+    <a href="results.html">Results</a>
+    <a href="contact.html">Contact</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </nav>
+</header>
+
+<div class="container">
+  <h1>📊 Student Results</h1>
+  <p>Track academic performance and achievement records</p>
+
+  <!-- Search & Filter Section -->
+  <div class="results-search-section">
+    <div class="search-controls">
+      <input type="text" id="searchStudent" placeholder="Search by name or roll number..." onkeyup="filterResults()">
+      <select id="filterCourse" onchange="filterResults()">
+        <option value="">All Courses</option>
+        <option value="C Language">C Language</option>
+        <option value="C++">C++</option>
+        <option value="Java">Java</option>
+        <option value="Python">Python</option>
+        <option value="Web Development">Web Development</option>
+      </select>
+      <select id="filterBatch" onchange="filterResults()">
+        <option value="">All Batches</option>
+        <option value="Morning">Morning (9-11 AM)</option>
+        <option value="Afternoon">Afternoon (2-4 PM)</option>
+        <option value="Evening">Evening (5-7 PM)</option>
+        <option value="Weekend">Weekend</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Add Result Form (Admin) -->
+  <div class="results-form-section" id="adminFormSection">
+    <h2>➕ Add Student Result</h2>
+    <div class="admin-info-banner">
+      <p>ℹ️ This section is only visible to administrators. Regular users can only view results.</p>
+    </div>
+    <div class="result-form">
+        <div class="form-group">
+          <input type="text" id="studentName" placeholder="Student Name" required>
+        </div>
+        <div class="form-group">
+          <input type="text" id="rollNumber" placeholder="Roll Number" required>
+        </div>
+        <div class="form-group">
+          <input type="email" id="studentEmail" placeholder="Email Address" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <select id="courseSelect" required>
+            <option value="">Select Course</option>
+            <option value="C Language">C Language</option>
+            <option value="C++">C++</option>
+            <option value="Java">Java</option>
+            <option value="Python">Python</option>
+            <option value="Web Development">Web Development</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <select id="batchSelect" required>
+            <option value="">Select Batch</option>
+            <option value="Morning">Morning (9-11 AM)</option>
+            <option value="Afternoon">Afternoon (2-4 PM)</option>
+            <option value="Evening">Evening (5-7 PM)</option>
+            <option value="Weekend">Weekend</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <input type="number" id="marksObtained" placeholder="Marks Obtained" min="0" max="100" required>
+        </div>
+        <div class="form-group">
+          <input type="number" id="totalMarks" placeholder="Total Marks" min="0" max="100" value="100" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <input type="date" id="resultDate" required>
+        </div>
+        <div class="form-group">
+          <textarea id="remarks" placeholder="Remarks (Optional)" rows="2"></textarea>
+        </div>
+      </div>
+      <button onclick="addStudentResult()" class="btn-add-result">Add Result</button>
+    </div>
+  </div>
+
+  <!-- Results Display Section -->
+  <div class="results-display-section">
+    <h2>📋 Student Results</h2>
+    <div class="results-container" id="resultsContainer">
+      <!-- Results will be displayed here -->
+      <div class="empty-state">
+        <p>📝 No results added yet. Add a student result to get started!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results Statistics -->
+  <div class="results-stats-section">
+    <h2>📈 Results Statistics</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Total Students</h3>
+        <p class="stat-number" id="totalStudents">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Average Score</h3>
+        <p class="stat-number" id="averageScore">0%</p>
+      </div>
+      <div class="stat-card">
+        <h3>Pass Rate</h3>
+        <p class="stat-number" id="passRate">0%</p>
+      </div>
+      <div class="stat-card">
+        <h3>Highest Score</h3>
+        <p class="stat-number" id="highestScore">0%</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-container">
+    <div class="footer-header">
+      <div class="footer-logo">VCG</div>
+      <div class="footer-header-text">
+        <h2>Vidhya Code Gurukul</h2>
+        <p>Your Gateway to Professional Coding Excellence</p>
+      </div>
+    </div>
+
+    <div class="footer-content">
+      <div class="footer-section">
+        <h3>About Us</h3>
+        <p>Vidhya Code Gurukul is dedicated to providing high-quality programming education to students and professionals. We believe in igniting the coding journey for everyone.</p>
+        <p>Our mission is to make quality education accessible and affordable for all aspiring developers.</p>
+      </div>
+
+      <div class="footer-section">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="courses.html">Courses</a></li>
+          <li><a href="batches.html">Batches</a></li>
+          <li><a href="promotions.html">Promotions</a></li>
+          <li><a href="results.html">Results</a></li>
+          <li><a href="contact.html">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Popular Courses</h3>
+        <ul>
+          <li>C Language</li>
+          <li>C++</li>
+          <li>Java</li>
+          <li>Python</li>
+          <li>Web Development</li>
+        </ul>
+      </div>
+
+      <div class="footer-section">
+        <h3>Contact Info</h3>
+        <div class="footer-contact">
+          <div class="footer-contact-icon">📍</div>
+          <div>
+            <strong>Address:</strong><br>
+            Helipad ke Piche, Tekamgarh<br>
+            Madhya Pradesh 472001
+          </div>
+        </div>
+        <div class="footer-contact">
+          <div class="footer-contact-icon">📞</div>
+          <div>
+            <strong>Phone:</strong><br>
+            +91 62329 83739
+          </div>
+        </div>
+        <div class="footer-contact">
+          <div class="footer-contact-icon">✉️</div>
+          <div>
+            <strong>Email:</strong><br>
+            ssaman7566@gmail.com
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2025 <strong>Vidhya Code Gurukul</strong> | All Rights Reserved | Designed & Managed by <a href="#">Vidhya Code Gurukul</a></p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
