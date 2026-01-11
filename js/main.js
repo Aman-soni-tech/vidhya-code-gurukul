@@ -1,41 +1,3 @@
-// ================= FIREBASE INITIALIZATION =================
-let database = null;
-
-// Wait for Firebase to load, then initialize
-function initializeFirebase() {
-  if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length === 0) {
-    const firebaseConfig = {
-      apiKey: "AIzaSyBKuS1tU6TKRjJpWOAWroNNiGXeXtMyI2E",
-      authDomain: "vidhya-code.firebaseapp.com",
-      databaseURL: "https://vidhya-code-default-rtdb.firebaseio.com",
-      projectId: "vidhya-code",
-      storageBucket: "vidhya-code.appspot.com",
-      messagingSenderId: "593593593593",
-      appId: "1:593593593593:web:abc123def456"
-    };
-    
-    try {
-      firebase.initializeApp(firebaseConfig);
-      database = firebase.database();
-      console.log("✅ Firebase initialized successfully");
-    } catch(error) {
-      console.error("⚠️ Firebase initialization error:", error);
-    }
-  }
-}
-
-// Initialize Firebase when document is ready
-document.addEventListener('DOMContentLoaded', function() {
-  initializeFirebase();
-});
-
-// Also try immediate initialization
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeFirebase);
-} else {
-  initializeFirebase();
-}
-
 // ================= LOGIN FUNCTION =================
 function login(event){
   event.preventDefault();
@@ -398,18 +360,15 @@ function addStudentResult(){
   results.push(newResult);
   localStorage.setItem("studentResults", JSON.stringify(results));
 
-  // Try to also save to Firebase if available
-  if(database && typeof database.ref === 'function'){
-    try {
-      const resultsRef = database.ref('studentResults');
-      resultsRef.push(newResult).then(() => {
+  // Try to save to Firebase if available
+  if(isFirebaseReady()){
+    writeToFirebase('studentResults', newResult)
+      .then(() => {
         console.log("✅ Saved to Firebase successfully");
-      }).catch(error => {
-        console.error("⚠️ Firebase error (data still saved locally):", error);
+      })
+      .catch(error => {
+        console.warn("⚠️ Firebase error (data saved locally):", error.message);
       });
-    } catch(error) {
-      console.error("⚠️ Firebase error (data still saved locally):", error);
-    }
   }
   
   alert("✅ Result added successfully!");
@@ -429,25 +388,26 @@ function displayResults(){
   // Try to load from Firebase first, fallback to localStorage
   let results = [];
   
-  if(database){
-    const resultsRef = database.ref('studentResults');
-    resultsRef.once('value', snapshot => {
-      if(snapshot.exists()){
-        // Load from Firebase
-        snapshot.forEach(childSnapshot => {
-          results.push(childSnapshot.val());
-        });
-      } else {
-        // Fallback to localStorage
+  if(isFirebaseReady()){
+    readFromFirebase('studentResults')
+      .then((firebaseData) => {
+        if(firebaseData){
+          // Convert Firebase object to array
+          Object.values(firebaseData).forEach(result => {
+            results.push(result);
+          });
+          console.log("✅ Loaded from Firebase:", results.length, "results");
+        } else {
+          // Fallback to localStorage
+          results = JSON.parse(localStorage.getItem("studentResults")) || [];
+        }
+        displayResultsOnPage(results);
+      })
+      .catch(error => {
+        console.warn("⚠️ Firebase read failed, using localStorage:", error.message);
         results = JSON.parse(localStorage.getItem("studentResults")) || [];
-      }
-      displayResultsOnPage(results);
-    }).catch(error => {
-      console.error("Error loading results:", error);
-      // Fallback to localStorage
-      results = JSON.parse(localStorage.getItem("studentResults")) || [];
-      displayResultsOnPage(results);
-    });
+        displayResultsOnPage(results);
+      });
   } else {
     // Firebase not available, use localStorage only
     results = JSON.parse(localStorage.getItem("studentResults")) || [];
